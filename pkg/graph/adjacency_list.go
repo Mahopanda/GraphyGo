@@ -35,12 +35,12 @@ func NewAdjacencyList(directed, weighted bool) *AdjacencyList {
 	}
 }
 
-func (g *AdjacencyList) AddNode(id int) {
-	// 新增一個節點到圖中
-	// 參數:
-	// - id: 節點的唯一標識符
-	// 節點會存儲到 g.nodes 中，並設置為 true 代表存在
-	g.nodes[id] = true
+func (g *AdjacencyList) AddNode(node int) error {
+	if _, exists := g.nodes[node]; exists {
+		return fmt.Errorf("節點 %d 已存在", node)
+	}
+	g.nodes[node] = true
+	return nil
 }
 
 func (g *AdjacencyList) AddEdge(from, to int, weight float64) error {
@@ -167,4 +167,12 @@ func (g *AdjacencyList) RemoveNode(id int) error {
 		}
 	}
 	return nil
+}
+
+func (g *AdjacencyList) GetNodes() []int {
+	nodes := make([]int, 0, len(g.edges))
+	for node := range g.edges {
+		nodes = append(nodes, node)
+	}
+	return nodes
 }

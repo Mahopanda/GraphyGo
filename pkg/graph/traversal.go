@@ -1,5 +1,10 @@
 package graph
 
+import (
+	"fmt"
+	"math/rand"
+)
+
 // BFS performs a breadth-first traversal of the graph starting from the given node.
 //
 // Parameters:
@@ -43,4 +48,68 @@ func BFS(g Graph, start int) ([]int, error) {
 		}
 	}
 	return result, nil // 返回遍歷結果
+}
+
+// DFS performs a depth-first traversal of the graph starting from the given node.
+func DFS(g Graph, start int) ([]int, error) {
+	visited := make(map[int]bool)
+	result := []int{}
+	
+	var dfs func(node int) error
+	dfs = func(node int) error {
+		visited[node] = true
+		result = append(result, node)
+		
+		neighbors, err := g.GetNeighbors(node)
+		if err != nil {
+			return err
+		}
+		
+		for _, neighbor := range neighbors {
+			if !visited[neighbor.To] {
+				if err := dfs(neighbor.To); err != nil {
+					return err
+				}
+			}
+		}
+		return nil
+	}
+	
+	if err := dfs(start); err != nil {
+		return nil, err
+	}
+	return result, nil
+}
+
+// RandomWalk performs a random walk on the graph for a specified number of steps.
+func RandomWalk(g *AdjacencyList, start int, steps int) ([]int, error) {
+	// 驗證起始節點是否存在
+	if !g.HasNode(start) {
+		return nil, fmt.Errorf("start node %d does not exist", start)
+	}
+
+	// 初始化結果切片，包含起始節點
+	walk := []int{start}
+	current := start
+
+	// 執行 steps-1 次移動（因為起始節點已經計入）
+	for i := 0; i < steps-1; i++ {
+		// 獲取當前節點的所有鄰居
+		neighbors := []int{}
+		for neighbor := range g.edges[current] {
+			neighbors = append(neighbors, neighbor)
+		}
+
+		// 檢查是否有鄰居節點
+		if len(neighbors) == 0 {
+			return nil, fmt.Errorf("node %d has no neighbors", current)
+		}
+
+		// 隨機選擇下一個節點
+		next := neighbors[rand.Intn(len(neighbors))]
+		walk = append(walk, next)
+		current = next
+	}
+
+	return walk, nil
 }

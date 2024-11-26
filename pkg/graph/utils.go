@@ -1,10 +1,5 @@
 package graph
 
-import (
-	"fmt"
-	"strings"
-)
-
 // IsDAG checks whether the given graph is a Directed Acyclic Graph (DAG).
 //
 // Parameters:
@@ -69,23 +64,23 @@ func IsDAG(g Graph) bool {
 // @startuml
 // 1 --> 2
 // @enduml
-func ToPlantUML(g Graph) string {
-	var sb strings.Builder
-	sb.WriteString("@startuml\n")
+// func ToPlantUML(g Graph) (string, error) {
+// 	var sb strings.Builder
+// 	sb.WriteString("@startuml\n")
 
-	// 添加有向或无向的边
-	for from := range g.(*AdjacencyList).edges {
-		edges, _ := g.GetNeighbors(from)
-		for _, edge := range edges {
-			// 使用方向性表示箭头
-			if g.IsDirected() {
-				sb.WriteString(fmt.Sprintf("%d --> %d\n", from, edge.To))
-			} else {
-				sb.WriteString(fmt.Sprintf("%d -- %d\n", from, edge.To))
-			}
-		}
-	}
+// 	// 獲取所有節點並遍歷它們的邊
+// 	nodes := g.GetNodes()
+// 	for _, from := range nodes {
+// 		edges, _ := g.GetNeighbors(from)
+// 		for _, edge := range edges {
+// 			if g.IsDirected() {
+// 				sb.WriteString(fmt.Sprintf("%d --> %d\n", from, edge.To))
+// 			} else {
+// 				sb.WriteString(fmt.Sprintf("%d -- %d\n", from, edge.To))
+// 			}
+// 		}
+// 	}
 
-	sb.WriteString("@enduml\n")
-	return sb.String()
-}
+// 	sb.WriteString("@enduml\n")
+// 	return sb.String(), nil
+// }
