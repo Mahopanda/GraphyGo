@@ -22,6 +22,16 @@ import (
 // g.AddEdge(1, 2, 0)
 // result, err := BFS(g, 1)
 // fmt.Println(result) // Output: [1, 2]
+
+// 初始化訪問標記
+// 將起點加入佇列
+// 當佇列不為空：
+//     取出佇列的第一個節點
+//     如果該節點未訪問：
+//         標記為已訪問
+//         將其鄰居加入佇列
+// 返回訪問過的節點列表
+
 func BFS(g Graph, start int) ([]int, error) {
 	visited := make(map[int]bool)
 	queue := []int{start}
