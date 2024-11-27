@@ -54,17 +54,17 @@ func BFS(g Graph, start int) ([]int, error) {
 func DFS(g Graph, start int) ([]int, error) {
 	visited := make(map[int]bool)
 	result := []int{}
-	
+
 	var dfs func(node int) error
 	dfs = func(node int) error {
 		visited[node] = true
 		result = append(result, node)
-		
+
 		neighbors, err := g.GetNeighbors(node)
 		if err != nil {
 			return err
 		}
-		
+
 		for _, neighbor := range neighbors {
 			if !visited[neighbor.To] {
 				if err := dfs(neighbor.To); err != nil {
@@ -74,7 +74,7 @@ func DFS(g Graph, start int) ([]int, error) {
 		}
 		return nil
 	}
-	
+
 	if err := dfs(start); err != nil {
 		return nil, err
 	}
@@ -95,9 +95,15 @@ func RandomWalk(g *AdjacencyList, start int, steps int) ([]int, error) {
 	// 執行 steps-1 次移動（因為起始節點已經計入）
 	for i := 0; i < steps-1; i++ {
 		// 獲取當前節點的所有鄰居
+		edges, err := g.GetNeighbors(current)
+		if err != nil {
+			return nil, fmt.Errorf("failed to get neighbors for node %d: %v", current, err)
+		}
+
+		// 轉換鄰居為節點列表
 		neighbors := []int{}
-		for neighbor := range g.edges[current] {
-			neighbors = append(neighbors, neighbor)
+		for _, edge := range edges {
+			neighbors = append(neighbors, edge.To)
 		}
 
 		// 檢查是否有鄰居節點

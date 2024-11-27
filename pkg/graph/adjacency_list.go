@@ -3,6 +3,9 @@ package graph
 import (
 	"errors"
 	"fmt"
+	"math"
+
+	"container/heap"
 )
 
 type AdjacencyList struct {
@@ -135,7 +138,7 @@ func (g *AdjacencyList) HasEdge(from, to int) bool {
 	// - to: 終止節點
 	// 回傳:
 	// - true: 邊存在
-	// - false: 邊不存在
+	// - false: 邊不存���
 	for _, edge := range g.edges[from] {
 		if edge.To == to {
 			return true
@@ -170,9 +173,73 @@ func (g *AdjacencyList) RemoveNode(id int) error {
 }
 
 func (g *AdjacencyList) GetNodes() []int {
-	nodes := make([]int, 0, len(g.edges))
-	for node := range g.edges {
+	nodes := make([]int, 0, len(g.nodes))
+	for node := range g.nodes {
 		nodes = append(nodes, node)
 	}
 	return nodes
+}
+
+// GetEdges 返回指定節點的邊列表
+func (g *AdjacencyList) GetEdges(node int) ([]Edge, error) {
+	if _, exists := g.nodes[node]; !exists {
+		return nil, fmt.Errorf("node %d does not exist", node)
+	}
+	return g.edges[node], nil
+}
+
+func AStar(g *AdjacencyList, start, goal int, heuristic func(int, int) float64) ([]int, error) {
+	// 初始化距離和前驅節點
+	distances := make(map[int]float64)
+	predecessors := make(map[int]int)
+	for _, node := range g.GetNodes() {
+		distances[node] = math.Inf(1)
+		predecessors[node] = -1
+	}
+	distances[start] = 0
+
+	// 初始化優先隊列
+	pq := &PriorityQueue{}
+	heap.Init(pq)
+	heap.Push(pq, &Item{value: start, priority: heuristic(start, goal)})
+
+	// 開始搜索
+	for pq.Len() > 0 {
+		current := heap.Pop(pq).(*Item).value
+
+		// 如果已到達目標，停止搜索
+		if current == goal {
+			break
+		}
+
+		// 遍歷當前節點的鄰居
+		edges, _ := g.GetEdges(current)
+		for _, edge := range edges {
+			alt := distances[current] + edge.Weight
+			if alt < distances[edge.To] {
+				// 更新距離和前驅節點
+				distances[edge.To] = alt
+				predecessors[edge.To] = current
+
+				// 計算總優先級 = 實際距離 + 啟發式距離
+				priority := alt + heuristic(edge.To, goal)
+				heap.Push(pq, &Item{value: edge.To, priority: priority})
+			}
+		}
+	}
+
+	// 在搜索完成後，重建路徑
+	path := []int{}
+	current := goal
+	for current != -1 {
+		path = append([]int{current}, path...)
+		current = predecessors[current]
+	}
+
+	// 檢查是否找到路徑
+	if len(path) == 0 || path[0] != start {
+		return nil, fmt.Errorf("無法找到從節點 %d 到節點 %d 的路徑", start, goal)
+	}
+
+	return path, nil
 }

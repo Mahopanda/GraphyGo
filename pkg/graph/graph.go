@@ -9,7 +9,8 @@ type Graph interface {
 	IsWeighted() bool                           // 判斷圖是否為加權圖
 	NodeCount() int                             // 返回圖中節點的數量
 	EdgeCount() int                             // 返回圖中邊的數量
-	GetNodes() []int
+	GetNodes() []int                            // 返回圖中所有節點
+	GetEdges(node int) ([]Edge, error)          // 返回指定節點的邊列表
 }
 
 // Edge represents a graph edge

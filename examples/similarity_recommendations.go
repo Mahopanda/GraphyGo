@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	"pkg/graph"
+	"github.com/Mahopanda/GraphyGo/pkg/graph"
 )
 
 //基于标签的相似度推荐
